@@ -29,7 +29,8 @@ public class Szamla {
     private Timestamp szdat;
     //NOTE: most konstans
     private String currencyCode = "HUF";
-    private String fizmodkod;
+    private BigDecimal exchRate = new BigDecimal(1);
+	private String fizmodkod;
     private Timestamp esdat;
     //NOTE: most konstans
     private String appearance = "PAPER";
@@ -194,6 +195,14 @@ public class Szamla {
     public OverallSummary getOverallSummary() {
         return overallSummary;
     }
+        
+    public BigDecimal getExchRate() {
+		return exchRate;
+	}
+
+	public void setExchRate(BigDecimal exchRate) {
+		this.exchRate = exchRate;
+	}
 
     public void calculateSummeries() {
         vatSummeries = new HashMap<>();

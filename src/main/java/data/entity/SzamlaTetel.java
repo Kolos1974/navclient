@@ -6,7 +6,8 @@ public class SzamlaTetel {
 
     private String iktSzam;
     private int tetelsorsz;
-    private String megnev;
+    private Boolean tetelKitoltve = true;
+	private String megnev;
     private BigDecimal mennyiseg;
     private String me;
     private BigDecimal egysegAr;
@@ -39,6 +40,14 @@ public class SzamlaTetel {
     public void setTetelsorsz(int tetelsorsz) {
         this.tetelsorsz = tetelsorsz;
     }
+
+    public Boolean getTetelKitoltve() {
+		return tetelKitoltve;
+	}
+
+	public void setTetelKitoltve(Boolean tetelKitoltve) {
+		this.tetelKitoltve = tetelKitoltve;
+	}
 
     public String getMegnev() {
         return megnev;

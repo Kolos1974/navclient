@@ -88,6 +88,7 @@ public class InvoiceGenerator {
             throw new InvoiceRequestGenException(e.getMessage());
         }
         invoiceData.setCurrencyCode(szamla.getCurrencyCode());
+        invoiceData.setExchangeRate(szamla.getExchRate());
         invoiceData.setPaymentMethod(szamla.getFizmodkod().equals("2") ?
                 PaymentMethodType.TRANSFER : PaymentMethodType.CASH);
         invoiceData.setInvoiceAppearance(InvoiceAppearanceType.PAPER);
@@ -107,10 +108,23 @@ public class InvoiceGenerator {
             LineType line = new LineType();
             if (tetel.getKozvSzolg().equals("Igen")) line.setIntermediatedService(true);
             line.setLineNumber(BigInteger.valueOf(tetel.getTetelsorsz()));
+            line.setLineExpressionIndicator(tetel.getTetelKitoltve());
             line.setLineDescription(tetel.getMegnev());
             line.setQuantity(tetel.getMennyiseg());
+            /*
             if (tetel.getMe() == null || tetel.getMe().equals("")) line.setUnitOfMeasure("db");
             else line.setUnitOfMeasure(tetel.getMe());
+            */
+            if (isNAVUnitOfMeasure(tetel.getMe().toUpperCase().trim())) {
+            	line.setUnitOfMeasure(unitOfMeasure(tetel.getMe().toUpperCase().trim()));
+            }
+            else
+            {
+            	line.setUnitOfMeasure(UnitOfMeasureType.OWN);
+                if (tetel.getMe() == null || tetel.getMe().equals("")) line.setUnitOfMeasureOwn("PIECE");
+                else line.setUnitOfMeasureOwn(tetel.getMe().toUpperCase().trim());
+            }
+            
             line.setUnitPrice(tetel.getEgysegAr());
             LineAmountsNormalType lineAmountsNormal = new LineAmountsNormalType();
             lineAmountsNormal.setLineNetAmount(tetel.getAfaalap());
@@ -180,5 +194,82 @@ public class InvoiceGenerator {
         invoice.setInvoiceExchange(invoiceExchange);
         return invoice;
     }
+
+    
+	public static UnitOfMeasureType unitOfMeasure(String measure) {
+		
+		UnitOfMeasureType NAVUnitOfMeasure=null; 		
+		
+		switch (measure.toUpperCase().trim()){
+		case "DB":
+			NAVUnitOfMeasure = UnitOfMeasureType.PIECE;
+			break;
+		case "KG":
+			NAVUnitOfMeasure = UnitOfMeasureType.KILOGRAM;
+			break;
+		case "T":
+			NAVUnitOfMeasure = UnitOfMeasureType.TON;
+			break;
+		case "KWH":
+			NAVUnitOfMeasure = UnitOfMeasureType.KWH;
+			break;
+		case "NAP":
+			NAVUnitOfMeasure = UnitOfMeasureType.DAY;
+			break;
+		case "ÓRA":
+			NAVUnitOfMeasure = UnitOfMeasureType.HOUR;
+			break;
+		case "PERC":
+			NAVUnitOfMeasure = UnitOfMeasureType.MINUTE;
+			break;
+		case "HÓ":
+			NAVUnitOfMeasure = UnitOfMeasureType.MONTH;
+			break;
+		case "LITER":
+			NAVUnitOfMeasure = UnitOfMeasureType.LITER;
+			break;
+		case "KILOMETER":
+			NAVUnitOfMeasure = UnitOfMeasureType.KILOMETER;
+			break;
+		case "M3":
+			NAVUnitOfMeasure = UnitOfMeasureType.CUBIC_METER;
+			break;
+		case "M":
+			NAVUnitOfMeasure = UnitOfMeasureType.METER;
+			break;
+		case "LM":
+			NAVUnitOfMeasure = UnitOfMeasureType.LINEAR_METER;
+			break;
+		case "KARTON":
+			NAVUnitOfMeasure = UnitOfMeasureType.CARTON;
+			break;
+		case "CSOMAG":
+			NAVUnitOfMeasure = UnitOfMeasureType.PACK;
+			break;
+			
+		// Missing:
+		// A	 - AMPER
+		// ALKAL - OPPORTUNITY
+		// ÉV	 - YEAR
+		// M2    - SQUARE_METER
+		// Q 	 - QUINTAL
+		
+		default:
+			NAVUnitOfMeasure = UnitOfMeasureType.OWN;
+			break;
+		}
+		return NAVUnitOfMeasure;
+	}
+    
+	public static boolean isNAVUnitOfMeasure(String unitOfLine){
+		if (!(unitOfMeasure(unitOfLine)==UnitOfMeasureType.OWN)) {
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+    
 
 }
